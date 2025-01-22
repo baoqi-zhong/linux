@@ -54,14 +54,14 @@
 		#size-cells = <1>;
 		ranges;
 
-		simplefb_lcd: framebuffer@0 {
-			compatible = "allwinner,simple-framebuffer",
-				     "simple-framebuffer";
-			allwinner,pipeline = "de0-lcd0";
-			clocks = <&ccu CLK_BUS_TCON0>, <&display_clocks 0>,
-				 <&display_clocks 6>, <&ccu CLK_TCON0>;
-			status = "disabled";
-		};
+//		simplefb_lcd: framebuffer@0 {
+//			compatible = "allwinner,simple-framebuffer",
+//				     "simple-framebuffer";
+//			allwinner,pipeline = "de0-lcd0";
+//			clocks = <&ccu CLK_BUS_TCON0>, <&display_clocks 0>,
+//				 <&display_clocks 6>, <&ccu CLK_TCON0>;
+//			status = "disabled";
+//		};
 	};
 
 	cpus {
@@ -345,16 +345,21 @@
 				drive-strength = <40>;
 			};
 
-			i2c0_pins: i2c0-pins {
-				pins = "PB6", "PB7";
-				bias-pull-up;
-				function = "i2c0";
-			};
+//			i2c0_pins: i2c0-pins {
+//				pins = "PB6", "PB7";
+//				bias-pull-up;
+//				function = "i2c0";
+//			};
 
 			pwm0_pins: pwm0 {
 				pins = "PB4";
 				function = "pwm0";
 			};
+
+//			pwm1_pins: pwm1 {
+//				pins = "PB5";
+//				function = "pwm01";
+//			};
 
 			uart0_pb_pins: uart0-pb-pins {
 				pins = "PB8", "PB9";
@@ -488,29 +493,29 @@
 			status = "disabled";
 		};
 
-		uart2: serial@1c28800 {
-			compatible = "snps,dw-apb-uart";
-			reg = <0x01c28800 0x400>;
-			interrupts = <GIC_SPI 2 IRQ_TYPE_LEVEL_HIGH>;
-			reg-shift = <2>;
-			reg-io-width = <4>;
-			clocks = <&ccu CLK_BUS_UART2>;
-			resets = <&ccu RST_BUS_UART2>;
-			status = "disabled";
-		};
+//		uart2: serial@1c28800 {
+//			compatible = "snps,dw-apb-uart";
+//			reg = <0x01c28800 0x400>;
+//			interrupts = <GIC_SPI 2 IRQ_TYPE_LEVEL_HIGH>;
+//			reg-shift = <2>;
+//			reg-io-width = <4>;
+//			clocks = <&ccu CLK_BUS_UART2>;
+//			resets = <&ccu RST_BUS_UART2>;
+//			status = "disabled";
+//		};
 
-		i2c0: i2c@1c2ac00 {
-			compatible = "allwinner,sun6i-a31-i2c";
-			reg = <0x01c2ac00 0x400>;
-			interrupts = <GIC_SPI 6 IRQ_TYPE_LEVEL_HIGH>;
-			clocks = <&ccu CLK_BUS_I2C0>;
-			resets = <&ccu RST_BUS_I2C0>;
-			pinctrl-names = "default";
-			pinctrl-0 = <&i2c0_pins>;
-			status = "disabled";
-			#address-cells = <1>;
-			#size-cells = <0>;
-		};
+//		i2c0: i2c@1c2ac00 {
+//			compatible = "allwinner,sun6i-a31-i2c";
+//			reg = <0x01c2ac00 0x400>;
+//			interrupts = <GIC_SPI 6 IRQ_TYPE_LEVEL_HIGH>;
+//			clocks = <&ccu CLK_BUS_I2C0>;
+//			resets = <&ccu RST_BUS_I2C0>;
+//			pinctrl-names = "default";
+//			pinctrl-0 = <&i2c0_pins>;
+//			status = "disabled";
+//			#address-cells = <1>;
+//			#size-cells = <0>;
+//		};
 
 		i2c1: i2c@1c2b000 {
 			compatible = "allwinner,sun6i-a31-i2c";

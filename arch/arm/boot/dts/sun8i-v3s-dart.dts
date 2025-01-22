@@ -49,6 +49,7 @@
 
 	aliases {
 		serial0 = &uart0;
+		spi0 = &spi0;
 	};
 
 	chosen {
@@ -105,11 +106,11 @@
 
 };
 
-&i2c0 {
-	pinctrl-0 = <&i2c0_pins>;
-	pinctrl-names = "default";
-	status = "okay";
-};
+//&i2c0 {
+//	pinctrl-0 = <&i2c0_pins>;
+//	pinctrl-names = "default";
+//	status = "okay";
+//};
 
 &i2c1 {
 	pinctrl-0 = <&i2c1_pins>;
@@ -172,6 +173,24 @@
 };
 
 &spi0 {
-	status ="okay";
-	
+    status = "okay";
+
+    st7789v: st7789v@0{
+        compatible = "sitronix,st7789v";
+        reg = <0>;
+        status = "okay";
+        spi-max-frequency = <64000000>;
+        spi-cpol;
+        spi-cpha;
+        rotate = <0>;
+        fps = <30>;
+        buswidth = <8>;
+        rgb;
+        dc-gpios    = <&pio 1 7 GPIO_ACTIVE_HIGH>;  // PB7
+        reset-gpios = <&pio 1 6 GPIO_ACTIVE_HIGH>;  // PB6
+        led-gpios   = <&pio 1 5 GPIO_ACTIVE_LOW>;  // PB5
+        width = <240>;
+        height= <240>;
+        debug = <0>;
+    };
 };

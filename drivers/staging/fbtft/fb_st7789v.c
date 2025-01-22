@@ -119,6 +119,9 @@ static int init_display(struct fbtft_par *par)
 	 */
 	write_reg(par, PWCTRL1, 0xA4, 0xA1);
 
+	// Invert display colors
+	write_reg(par, MIPI_DCS_ENTER_INVERT_MODE);
+
 	write_reg(par, MIPI_DCS_SET_DISPLAY_ON);
 	return 0;
 }

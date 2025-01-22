@@ -105,10 +105,16 @@
 
 };
 
+&i2c0 {
+	pinctrl-0 = <&i2c0_pins>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
 &i2c1 {
-    	pinctrl-0 = <&i2c1_pins>;
-		pinctrl-names = "default";
-		status = "okay";
+	pinctrl-0 = <&i2c1_pins>;
+	pinctrl-names = "default";
+	status = "okay";
 
 	// ov7725: camera@21 {
 	// 	compatible = "ovti,ov7725";
@@ -133,8 +139,6 @@
 		pinctrl-0 = <&csi1_mclk>;
 		clocks = <&ccu CLK_CSI1_MCLK>;
 		clock-names = "xvclk";
-		resetb-gpios = <&pio 4 16 GPIO_ACTIVE_LOW>; /* PE16 */
-		pwdn-gpios = <&pio 4 17 GPIO_ACTIVE_LOW>; /* PE17 */
 		assigned-clocks = <&ccu CLK_CSI1_MCLK>;
 		assigned-clock-rates = <24000000>;
 		

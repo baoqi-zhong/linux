@@ -141,3 +141,9 @@ x509.genkey
 
 # Kdevelop4
 *.kdev4
+
+# track .config changes
+!/.config
+
+# kernel module
+/out

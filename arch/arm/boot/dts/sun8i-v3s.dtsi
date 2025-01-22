@@ -388,6 +388,31 @@
 				pins = "PC0", "PC1", "PC2", "PC3";
 				function = "spi0";
 			};
+
+			csi1_8bit: csi1-8bit@0 {
+				pins = "PE0", "PE2", "PE3", "PE8", "PE9",                      // PCLK, HSYNK, VSYNK, D4, D5, 
+				       "PE10", "PE11", "PE12", "PE13", "PE14",                 // D6, D7, D8, D9, D10
+				       "PE15";                                                 // D11
+				bias-disable;
+				function = "csi";
+			};
+
+			csi1_clk: csi1-clk@0 {
+				pins = "PE0","PE2","PE3";
+				bias-disable;
+				function = "csi";
+			};
+
+			csi1_mclk: csi1-mclk@0 {
+				pins = "PE1";
+				bias-disable;
+				function = "csi";
+			};
+
+			i2c1_pins: i2c1 {
+				pins = "PE21", "PE22";
+				function = "i2c1";
+			};
 		};
 
 		timer@1c20c00 {
@@ -557,6 +582,18 @@
 			#size-cells = <0>;
 		};
 
+		csi1: csi@1cb4000 {
+			compatible = "allwinner,sun8i-v3s-csi";
+			reg = <0x01cb4000 0x1000>;
+			interrupts = <GIC_SPI 84 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&ccu CLK_BUS_CSI>,
+					<&ccu CLK_CSI1_SCLK>,
+					<&ccu CLK_DRAM_CSI>;
+			clock-names = "bus", "mod", "ram";
+			resets = <&ccu RST_BUS_CSI>;
+			status = "disabled";
+		};	
+		
 		gic: interrupt-controller@1c81000 {
 			compatible = "arm,gic-400";
 			reg = <0x01c81000 0x1000>,

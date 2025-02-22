@@ -188,6 +188,7 @@
 #define   COM3_SING_FR_SNAPSH  0x01 /* 0 For enable live video output after the
 				     * snapshot sequence*/
 #define AEC         0x10 /* AEC[9:2] Exposure Value */
+#define   AEC_SET(x)            VAL_SET(x, 0xFF, 2, 0)
 #define CLKRC       0x11 /* Internal clock */
 #define   CLKRC_EN             0x80
 #define   CLKRC_DIV_SET(x)     (((x) - 1) & 0x1F) /* CLK = XVCLK/(x) */
@@ -244,6 +245,8 @@
 #define   REG32_PCLK_DIV_4    0xC0 /* PCLK freq divided by 4 */
 #define ARCOM2      0x34 /* Zoom: Horizontal start point */
 #define REG45       0x45 /* Register 45 */
+#define   REG45_AGC_SET(x)   	VAL_SET(x, 0x3, 8, 6)
+#define   REG45_AEC_SET(x)		VAL_SET(x, 0x3F, 10, 0)
 #define FLL         0x46 /* Frame Length Adjustment LSBs */
 #define FLH         0x47 /* Frame Length Adjustment MSBs */
 #define COM19       0x48 /* Zoom: Vertical start point */
@@ -322,7 +325,7 @@ static const struct regval_list ov2640_init_regs[] = {
 	{ 0x2c,   0xff },
 	{ 0x2e,   0xdf },
 	{ BANK_SEL, BANK_SEL_SENS },
-	{ 0x3c,   0xEF },
+	{ 0x3c,   0x32 },
 	{ CLKRC,  CLKRC_DIV_SET(1) },
 	{ COM2,   COM2_OCAP_Nx_SET(3) },
 	{ REG04,  REG04_DEF | REG04_HREF_EN },
@@ -718,7 +721,7 @@ static int ov2640_s_ctrl(struct v4l2_ctrl *ctrl)
 	struct i2c_client  *client = v4l2_get_subdevdata(sd);
 	struct ov2640_priv *priv = to_ov2640(client);
 	u8 val;
-	int ret;
+	int ret, ret2, ret3;
 
 	/* v4l2_ctrl_lock() locks our own mutex */
 
@@ -746,6 +749,24 @@ static int ov2640_s_ctrl(struct v4l2_ctrl *ctrl)
 	case V4L2_CID_TEST_PATTERN:
 		val = ctrl->val ? COM7_COLOR_BAR_TEST : 0x00;
 		return ov2640_mask_set(client, COM7, COM7_COLOR_BAR_TEST, val);
+	case V4L2_CID_EXPOSURE_ABSOLUTE:
+		ret = ov2640_mask_set(client, REG04, 0x03, REG04_AEC_SET(ctrl->val));
+		ret2 = ov2640_mask_set(client, AEC, 0xFF, AEC_SET(ctrl->val));
+		ret3 = ov2640_mask_set(client, REG45, 0x3F, REG45_AEC_SET(ctrl->val));
+		return ret < 0 ? ret : ret2 < 0 ? ret2 : ret3;
+	case V4L2_CID_EXPOSURE_AUTO:
+		if(ctrl->val == V4L2_EXPOSURE_AUTO)
+			val = COM8_AEC_EN;
+		else if(ctrl->val == V4L2_EXPOSURE_MANUAL)
+			val = 0x00;
+		else
+			return -EINVAL;
+		return ov2640_mask_set(client, COM8, COM8_AEC_EN, val);
+	case V4L2_CID_AUTOGAIN:
+		val = ctrl->val ? COM8_AGC_EN : 0x00;
+		return ov2640_mask_set(client, COM8, COM8_AGC_EN, val);
+	case V4L2_CID_GAIN:
+		return -1;
 	}
 
 	return -EINVAL;
@@ -1227,12 +1248,21 @@ static int ov2640_probe(struct i2c_client *client,
 	priv->subdev.flags |= V4L2_SUBDEV_FL_HAS_DEVNODE |
 			      V4L2_SUBDEV_FL_HAS_EVENTS;
 	mutex_init(&priv->lock);
-	v4l2_ctrl_handler_init(&priv->hdl, 3);
+	v4l2_ctrl_handler_init(&priv->hdl, 5);
 	priv->hdl.lock = &priv->lock;
 	v4l2_ctrl_new_std(&priv->hdl, &ov2640_ctrl_ops,
 			V4L2_CID_VFLIP, 0, 1, 1, 0);
 	v4l2_ctrl_new_std(&priv->hdl, &ov2640_ctrl_ops,
 			V4L2_CID_HFLIP, 0, 1, 1, 0);
+	v4l2_ctrl_new_std(&priv->hdl, &ov2640_ctrl_ops,
+			V4L2_CID_EXPOSURE_ABSOLUTE, 0, 65535, 1, 1000);
+	// v4l2_ctrl_new_std(&priv->hdl, &ov2640_ctrl_ops,
+	// 		V4L2_CID_AUTOGAIN, 0, 1, 1, 1);
+	// v4l2_ctrl_new_std(&priv->hdl, &ov2640_ctrl_ops,
+	// 		V4L2_CID_GAIN, 1, 32, 0.0625, 16);
+	v4l2_ctrl_new_std_menu(&priv->hdl, &ov2640_ctrl_ops,
+			V4L2_CID_EXPOSURE_AUTO, 
+			1, 0xC, 0);
 	v4l2_ctrl_new_std_menu_items(&priv->hdl, &ov2640_ctrl_ops,
 			V4L2_CID_TEST_PATTERN,
 			ARRAY_SIZE(ov2640_test_pattern_menu) - 1, 0, 0,
